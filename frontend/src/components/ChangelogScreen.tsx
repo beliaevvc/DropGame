@@ -14,14 +14,17 @@ export default function ChangelogScreen({
     []
   );
 
-  // Telegram MainButton только в ТГ
+  // 🔹 Telegram MainButton
   useEffect(() => {
     const tg = (window as any).Telegram?.WebApp;
     if (!tg) return;
+
     tg.MainButton.setText("⬅️ Назад");
     tg.MainButton.show();
+
     const handler = () => onBack();
     tg.MainButton.onClick(handler);
+
     return () => {
       tg.MainButton.offClick(handler);
       tg.MainButton.hide();
@@ -32,9 +35,7 @@ export default function ChangelogScreen({
     <div
       className="w-full h-full flex flex-col items-center p-6 text-white"
       style={{
-        // принудительно чёрный фон, без оглядки на тему Telegram
-        backgroundColor: "#000000",
-        // высота с учётом мобильного вьюпорта (если переменная задана в App)
+        backgroundColor: "#000000", // фиксированный чёрный фон
         minHeight: "var(--app-vh, 100vh)",
       }}
     >
@@ -56,7 +57,7 @@ export default function ChangelogScreen({
         ))}
       </div>
 
-      {/* В браузере оставляем кнопку; в Telegram — скрыта, там MainButton */}
+      {/* 🔹 Кнопка "Назад" только для браузера */}
       {!isTelegram && (
         <button className="btn btn-primary mt-6" onClick={onBack}>
           Назад
