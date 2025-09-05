@@ -18,15 +18,24 @@ export default function App() {
   const [lastScore, setLastScore] = useState(0);
   const [isNewRecord, setIsNewRecord] = useState(false);
 
-  // Telegram init + тема + высота + спрятать MainButton + задать отступ HUD
+  // Telegram init + тема + высота + спрятать MainButton + принудительный фон body
   useEffect(() => {
     const tg = (window as any).Telegram?.WebApp;
+
+    const setBodyFromVars = () => {
+      const rs = getComputedStyle(document.documentElement);
+      const bg = rs.getPropertyValue("--tg-bg").trim() || "#000000";
+      const fg = rs.getPropertyValue("--tg-text").trim() || "#ffffff";
+      document.body.style.backgroundColor = bg;
+      document.body.style.color = fg;
+    };
 
     const applyTheme = () => {
       const th = tg?.themeParams || {};
       document.documentElement.style.setProperty("--tg-bg", th.bg_color || "#000000");
       document.documentElement.style.setProperty("--tg-text", th.text_color || "#ffffff");
       document.documentElement.style.setProperty("--tg-hint", th.hint_color || "rgba(255,255,255,0.6)");
+      setBodyFromVars(); // ← сразу красим <body>
     };
 
     const applyVh = () => {
@@ -34,31 +43,34 @@ export default function App() {
       document.documentElement.style.setProperty("--app-vh", `${vh}px`);
     };
 
-    // Базовые значения, если НЕ в Telegram (браузер)
     if (!tg) {
+      // Браузер
       document.documentElement.style.setProperty("--tg-bg", "#000000");
       document.documentElement.style.setProperty("--tg-text", "#ffffff");
       document.documentElement.style.setProperty("--tg-hint", "rgba(255,255,255,0.6)");
       document.documentElement.style.setProperty("--hud-offset", "20px");
       document.documentElement.style.setProperty("--app-vh", `${window.innerHeight}px`);
+      setBodyFromVars();
+
       const onResize = () =>
         document.documentElement.style.setProperty("--app-vh", `${window.innerHeight}px`);
       window.addEventListener("resize", onResize);
       return () => window.removeEventListener("resize", onResize);
     }
 
-    // В Telegram
+    // Telegram
     tg.ready?.();
     tg.expand?.();
-    tg.MainButton?.hide?.(); // убираем системную кнопку
-
-    // Отступ HUD чуть больше, чтобы не перекрывалось шапкой Telegram
+    tg.MainButton?.hide?.();
     document.documentElement.style.setProperty("--hud-offset", "56px");
 
     applyTheme();
     applyVh();
 
-    tg.onEvent?.("themeChanged", applyTheme);
+    tg.onEvent?.("themeChanged", () => {
+      applyTheme();
+      setBodyFromVars();
+    });
     tg.onEvent?.("viewportChanged", applyVh);
 
     return () => {
@@ -80,9 +92,9 @@ export default function App() {
 
   return (
     <div
-      className="w-full flex items-center justify-center"
+      className="flex items-center justify-center"
       style={{
-        // Всегда чёрный фон и белый текст по умолчанию
+        width: "100vw",
         height: "var(--app-vh, 100vh)",
         backgroundColor: "var(--tg-bg, #000000)",
         color: "var(--tg-text, #ffffff)",
