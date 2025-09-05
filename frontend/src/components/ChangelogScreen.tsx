@@ -9,23 +9,19 @@ export default function ChangelogScreen({
   version: string;
   onBack: () => void;
 }) {
-  // Определяем, запущено ли приложение в Telegram
   const isTelegram = useMemo(
     () => Boolean((window as any)?.Telegram?.WebApp),
     []
   );
 
-  // 🔹 Telegram MainButton (только внутри ТГ)
+  // Telegram MainButton только в ТГ
   useEffect(() => {
     const tg = (window as any).Telegram?.WebApp;
     if (!tg) return;
-
     tg.MainButton.setText("⬅️ Назад");
     tg.MainButton.show();
-
     const handler = () => onBack();
     tg.MainButton.onClick(handler);
-
     return () => {
       tg.MainButton.offClick(handler);
       tg.MainButton.hide();
@@ -34,12 +30,11 @@ export default function ChangelogScreen({
 
   return (
     <div
-      className="w-full h-full flex flex-col items-center p-6"
+      className="w-full h-full flex flex-col items-center p-6 text-white"
       style={{
-        // Чёрный фон по умолчанию, но если ТГ передал тему — берём её
-        backgroundColor: "var(--tg-bg, #000000)",
-        color: "var(--tg-text, #ffffff)",
-        // Высота с учётом мобильного вьюпорта (если переменная задана в App)
+        // принудительно чёрный фон, без оглядки на тему Telegram
+        backgroundColor: "#000000",
+        // высота с учётом мобильного вьюпорта (если переменная задана в App)
         minHeight: "var(--app-vh, 100vh)",
       }}
     >
@@ -61,7 +56,7 @@ export default function ChangelogScreen({
         ))}
       </div>
 
-      {/* 🔹 В браузере показываем обычную кнопку; в Telegram — скрываем (там MainButton) */}
+      {/* В браузере оставляем кнопку; в Telegram — скрыта, там MainButton */}
       {!isTelegram && (
         <button className="btn btn-primary mt-6" onClick={onBack}>
           Назад
