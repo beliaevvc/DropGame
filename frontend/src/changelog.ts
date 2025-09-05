@@ -9,6 +9,16 @@ export type ChangelogEntry = {
 // История изменений (добавляй новые записи в начало)
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: "v0.3.2",
+    notes: [
+      "Интеграция с Telegram WebApp (ready/expand, тема, viewport)",
+      "Скрыта системная кнопка Telegram (MainButton)",
+      "Единый чёрный фон на всех экранах (Start/Game/Changelog)",
+      "HUD опущен ниже, чтобы не перекрывался интерфейсом Telegram",
+      "Мелкие правки стилей и инициализации",
+    ],
+  },
+  {
     version: "v0.3.1",
     notes: [
       "Новый спец-символ Таймер",
