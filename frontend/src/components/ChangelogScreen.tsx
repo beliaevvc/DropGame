@@ -14,20 +14,23 @@ export default function ChangelogScreen({
     []
   );
 
-  // 🔹 В Telegram прячем системную кнопку (ничего не показываем)
+  // 🔹 В Telegram полностью прячем системную кнопку
   useEffect(() => {
     const tg = (window as any).Telegram?.WebApp;
     if (!tg) return;
     tg.MainButton?.hide?.();
-    // никаких onClick/ setText / show — полностью отключаем
   }, []);
 
   return (
     <div
-      className="w-full h-full flex flex-col items-center p-6 text-white"
+      className="w-full h-full relative flex flex-col items-center text-white"
       style={{
-        backgroundColor: "#000000", // фиксированный чёрный фон
-        minHeight: "var(--app-vh, 100vh)",
+        backgroundColor: "#000000",                     // фиксированный чёрный фон
+        minHeight: "var(--app-vh, 100vh)",              // корректная высота
+        paddingTop: "calc(24px + env(safe-area-inset-top, 0px))",
+        paddingBottom: "calc(28px + env(safe-area-inset-bottom, 0px))",
+        paddingLeft: "16px",
+        paddingRight: "16px",
       }}
     >
       <h1 className="text-2xl font-bold mb-4">Обновления</h1>
@@ -55,7 +58,7 @@ export default function ChangelogScreen({
         </button>
       )}
 
-      <div className="absolute bottom-3 text-xs text-white/60">
+      <div className="absolute bottom-4 text-xs text-white/60">
         Emoji Drop {version}
       </div>
     </div>
