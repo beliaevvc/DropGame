@@ -100,6 +100,7 @@ export class GameEngine {
 
   async init() {
     await this.app.init({
+      background: 0x000000
       backgroundAlpha: 0,
       antialias: true,
       resizeTo: this.view,
