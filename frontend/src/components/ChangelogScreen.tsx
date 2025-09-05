@@ -1,5 +1,5 @@
 // frontend/src/components/ChangelogScreen.tsx
-import React, { useEffect, useMemo } from "react";
+import React from "react";
 import { CHANGELOG, ChangelogEntry } from "../changelog";
 
 export default function ChangelogScreen({
@@ -9,28 +9,6 @@ export default function ChangelogScreen({
   version: string;
   onBack: () => void;
 }) {
-  const isTelegram = useMemo(
-    () => Boolean((window as any)?.Telegram?.WebApp),
-    []
-  );
-
-  // 🔹 Telegram MainButton
-  useEffect(() => {
-    const tg = (window as any).Telegram?.WebApp;
-    if (!tg) return;
-
-    tg.MainButton.setText("⬅️ Назад");
-    tg.MainButton.show();
-
-    const handler = () => onBack();
-    tg.MainButton.onClick(handler);
-
-    return () => {
-      tg.MainButton.offClick(handler);
-      tg.MainButton.hide();
-    };
-  }, [onBack]);
-
   return (
     <div
       className="w-full h-full flex flex-col items-center p-6 text-white"
@@ -57,12 +35,10 @@ export default function ChangelogScreen({
         ))}
       </div>
 
-      {/* 🔹 Кнопка "Назад" только для браузера */}
-      {!isTelegram && (
-        <button className="btn btn-primary mt-6" onClick={onBack}>
-          Назад
-        </button>
-      )}
+      {/* 🔹 Обычная кнопка (работает и в браузере, и в Telegram) */}
+      <button className="btn btn-primary mt-6" onClick={onBack}>
+        Назад
+      </button>
 
       <div className="absolute bottom-3 text-xs text-white/60">
         Emoji Drop {version}
