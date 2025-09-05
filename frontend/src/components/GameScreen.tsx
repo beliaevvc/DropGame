@@ -1,3 +1,4 @@
+// frontend/src/components/GameScreen.tsx
 import React, { useEffect, useRef, useState } from "react";
 import { GameEngine } from "../game/engine";
 import { GAME_SECONDS } from "../game/config";
@@ -16,11 +17,7 @@ export default function GameScreen({
   const [score, setScore] = useState(0);
   const [sec, setSec] = useState(GAME_SECONDS);
   const [countdown, setCountdown] = useState<number | null>(3);
-
-  // состояния визуалки
   const [multActive, setMultActive] = useState(false);
-  const [timeBoostBlink, setTimeBoostBlink] = useState(false); // зелёный «бум»
-  const [showPlus5, setShowPlus5] = useState(false);           // бейджик +5s
 
   useEffect(() => {
     const host = hostRef.current!;
@@ -29,13 +26,6 @@ export default function GameScreen({
       onBomb: (total) => setScore(total),
       onRocket: (_gain, total) => setScore(total),
       onMultiplier: (active) => setMultActive(active),
-      onTimerBonus: () => {
-        // краткая зелёная анимация и бейдж +5s
-        setTimeBoostBlink(true);
-        setShowPlus5(true);
-        setTimeout(() => setTimeBoostBlink(false), 650);
-        setTimeout(() => setShowPlus5(false), 800);
-      },
     });
     engineRef.current = engine;
 
@@ -83,8 +73,11 @@ export default function GameScreen({
         if (e) {
           e.running = false;
           e.app.ticker.stop();
+
+          // подчистим объекты игры
           (e as any).layerDrops?.removeChildren?.();
 
+          // подчистим сцену Pixi
           const stage = e.app.stage as any;
           if (stage?.children) {
             for (const ch of [...stage.children]) {
@@ -92,37 +85,35 @@ export default function GameScreen({
               ch?.destroy?.();
             }
           }
+
+          // Pixi v8: только removeView
           e.app.destroy({ removeView: true });
         }
       } catch {}
+
       engineRef.current = null;
     };
   }, [onExit]);
 
   return (
     <div className="w-full h-full relative">
-      {/* HUD */}
-      <div className="hud flex justify-between items-center pt-[env(safe-area-inset-top,20px)] px-4">
+      {/* HUD — опущен вниз от шапки TG/браузера */}
+      <div
+        className="absolute left-0 right-0 z-10 flex justify-between items-center px-4"
+        style={{ top: "var(--hud-offset, 20px)" }}
+      >
         <div className="text-lg font-bold">
           Очки: <span className="text-accent">{score}</span>
         </div>
 
         <div className="flex items-center gap-2">
           <div
-            className={[
-              "text-lg font-bold transition-transform",
-              sec <= 10 && !timeBoostBlink ? "text-red-500 animate-pulse-scale" : "",
-              timeBoostBlink ? "text-green-400 animate-bump" : "",
-            ].join(" ")}
+            className={`text-lg font-bold ${
+              sec <= 10 ? "text-red-500 animate-pulse-scale" : ""
+            }`}
           >
             Время: {sec}s
           </div>
-
-          {showPlus5 && (
-            <div className="px-2 py-0.5 rounded bg-green-400 text-black font-bold text-xs shadow">
-              +5s
-            </div>
-          )}
 
           {multActive && (
             <div className="px-2 py-0.5 rounded bg-yellow-400 text-black font-bold text-sm">
