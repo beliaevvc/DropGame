@@ -102,7 +102,7 @@ export default function GameScreen({
   return (
     <div className="w-full h-full relative">
       {/* HUD */}
-      <div className="hud flex justify-between items-center">
+      <div className="hud flex justify-between items-center pt-[env(safe-area-inset-top,20px)] px-4">
         <div className="text-lg font-bold">
           Очки: <span className="text-accent">{score}</span>
         </div>
