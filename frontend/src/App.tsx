@@ -18,7 +18,7 @@ export default function App() {
   const [lastScore, setLastScore] = useState(0);
   const [isNewRecord, setIsNewRecord] = useState(false);
 
-  // --- Telegram WebApp init + тема + динамическая высота ---
+  // Telegram init + тема + высота + спрятать MainButton + задать отступ HUD
   useEffect(() => {
     const tg = (window as any).Telegram?.WebApp;
 
@@ -34,32 +34,36 @@ export default function App() {
       document.documentElement.style.setProperty("--app-vh", `${vh}px`);
     };
 
-    // Инициализация Telegram WebApp
-    tg?.ready?.();
-    tg?.expand?.();
-    tg?.MainButton?.hide?.(); // 🔹 скрываем системную кнопку Telegram
-
-    applyTheme();
-    tg?.onEvent?.("themeChanged", applyTheme);
-
-    applyVh();
-    tg?.onEvent?.("viewportChanged", applyVh);
-
+    // Базовые значения, если НЕ в Telegram (браузер)
     if (!tg) {
       document.documentElement.style.setProperty("--tg-bg", "#000000");
       document.documentElement.style.setProperty("--tg-text", "#ffffff");
       document.documentElement.style.setProperty("--tg-hint", "rgba(255,255,255,0.6)");
-      applyVh();
-      const onResize = () => {
+      document.documentElement.style.setProperty("--hud-offset", "20px");
+      document.documentElement.style.setProperty("--app-vh", `${window.innerHeight}px`);
+      const onResize = () =>
         document.documentElement.style.setProperty("--app-vh", `${window.innerHeight}px`);
-      };
       window.addEventListener("resize", onResize);
       return () => window.removeEventListener("resize", onResize);
     }
 
+    // В Telegram
+    tg.ready?.();
+    tg.expand?.();
+    tg.MainButton?.hide?.(); // убираем системную кнопку
+
+    // Отступ HUD чуть больше, чтобы не перекрывалось шапкой Telegram
+    document.documentElement.style.setProperty("--hud-offset", "56px");
+
+    applyTheme();
+    applyVh();
+
+    tg.onEvent?.("themeChanged", applyTheme);
+    tg.onEvent?.("viewportChanged", applyVh);
+
     return () => {
-      tg?.offEvent?.("themeChanged", applyTheme);
-      tg?.offEvent?.("viewportChanged", applyVh);
+      tg.offEvent?.("themeChanged", applyTheme);
+      tg.offEvent?.("viewportChanged", applyVh);
     };
   }, []);
 
@@ -78,9 +82,10 @@ export default function App() {
     <div
       className="w-full flex items-center justify-center"
       style={{
-        height: "var(--app-vh, 100vh)",           // если переменной нет → 100vh
-        backgroundColor: "var(--tg-bg, #000000)", // по умолчанию чёрный
-        color: "var(--tg-text, #ffffff)",         // по умолчанию белый
+        // Всегда чёрный фон и белый текст по умолчанию
+        height: "var(--app-vh, 100vh)",
+        backgroundColor: "var(--tg-bg, #000000)",
+        color: "var(--tg-text, #ffffff)",
       }}
     >
       {screen === "start" && (
